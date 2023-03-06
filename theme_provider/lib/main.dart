@@ -45,12 +45,11 @@ class _MyHomePageState extends State<MyHomePage> {
   final List<ThemeData> _lightThemes = List.generate(
     5,
     (index) {
-      Color ramdomColor = Color((math.Random().nextDouble() * 0xFFFFFF).toInt())
+      Color randomColor = Color((math.Random().nextDouble() * 0xFFFFFF).toInt())
           .withOpacity(1.0);
       return ThemeData.light().copyWith(
-        primaryColor: ramdomColor,
-        colorScheme: const ColorScheme.light().copyWith(
-          primary: ramdomColor,
+        appBarTheme: AppBarTheme(
+          backgroundColor: randomColor,
         ),
       );
     },
@@ -59,16 +58,13 @@ class _MyHomePageState extends State<MyHomePage> {
   final List<ThemeData> _darkThemes = List.generate(
     5,
     (index) {
-      Color ramdomColor = Color((math.Random().nextDouble() * 0xFFFFFF).toInt())
+      Color randomColor = Color((math.Random().nextDouble() * 0xFFFFFF).toInt())
           .withOpacity(1.0);
       return ThemeData.dark().copyWith(
-          primaryColor: ramdomColor,
-          colorScheme: const ColorScheme.dark().copyWith(
-            primary: ramdomColor,
-          ),
-          appBarTheme: AppBarTheme(
-            backgroundColor: ramdomColor,
-          ));
+        appBarTheme: AppBarTheme(
+          backgroundColor: randomColor,
+        ),
+      );
     },
   );
   var _selectedOption;
@@ -82,8 +78,53 @@ class _MyHomePageState extends State<MyHomePage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            Text(
-              'CustomTheme: ${ThemeServiceProvider.of(context).currentThemeData}',
+            const Divider(),
+            const Text("Light themes"),
+            Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                        "${ThemeServiceProvider.of(context).lightThemeData.appBarTheme.backgroundColor}}"),
+                    Container(
+                      margin: const EdgeInsets.only(left: 10),
+                      height: 20,
+                      width: 20,
+                      color: ThemeServiceProvider.of(context)
+                          .lightThemeData
+                          .appBarTheme
+                          .backgroundColor,
+                    )
+                  ],
+                ),
+              ],
+            ),
+            const Divider(),
+            const Text("Dark themes"),
+            Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                        "${ThemeServiceProvider.of(context).darkThemeData.appBarTheme.backgroundColor}}"),
+                    Container(
+                      margin: const EdgeInsets.only(left: 10),
+                      height: 20,
+                      width: 20,
+                      color: ThemeServiceProvider.of(context)
+                          .darkThemeData
+                          .appBarTheme
+                          .backgroundColor,
+                    )
+                  ],
+                ),
+              ],
             ),
             const Divider(),
             SizedBox(
@@ -103,10 +144,57 @@ class _MyHomePageState extends State<MyHomePage> {
                           onChanged: (value) {
                             setState(() {
                               _selectedOption = value;
+
                               ThemeServiceProvider.of(context)
-                                  .onChangeSystemTheme(
-                                changeForDarkTheme: _darkThemes.contains(value),
-                                themeData: value as ThemeData,
+                                  .rollBackThemeScope(
+                                nextAction: () {
+                                  ThemeServiceProvider.of(context)
+                                      .onChangeSystemTheme(
+                                    changeForDarkTheme:
+                                        _darkThemes.contains(value),
+                                    themeData: value as ThemeData,
+                                  );
+                                },
+                                confirmAction: () async {
+                                  showAlertDialog<bool>(BuildContext context) {
+                                    // set up the buttons
+                                    Widget cancelButton = TextButton(
+                                      child: const Text("Cancel"),
+                                      onPressed: () {
+                                        Navigator.of(context).pop(false);
+                                      },
+                                    );
+                                    Widget continueButton = TextButton(
+                                      child: const Text("Continue"),
+                                      onPressed: () {
+                                        Navigator.of(context).pop(true);
+                                      },
+                                    );
+
+                                    // set up the AlertDialog
+                                    AlertDialog alert = AlertDialog(
+                                      title: const Text("AlertDialog"),
+                                      content: const Text(
+                                          "Would you like to continue learning how to use Flutter alerts?"),
+                                      actions: [
+                                        cancelButton,
+                                        continueButton,
+                                      ],
+                                    );
+
+                                    // show the dialog
+                                    return showDialog<bool?>(
+                                      context: context,
+                                      builder: (BuildContext context) {
+                                        return alert;
+                                      },
+                                    );
+                                  }
+
+                                  bool? result = await showAlertDialog(context);
+
+                                  return result ?? false;
+                                },
                               );
                             });
                           },
@@ -137,12 +225,12 @@ class _MyHomePageState extends State<MyHomePage> {
                               value: value as ThemeData,
                               child: Row(
                                 children: [
-                                  Text("${value.colorScheme.primary}}"),
+                                  Text("${value.appBarTheme.backgroundColor}}"),
                                   Container(
                                     margin: const EdgeInsets.only(left: 10),
                                     height: 20,
                                     width: 20,
-                                    color: value.colorScheme.primary,
+                                    color: value.appBarTheme.backgroundColor,
                                   )
                                 ],
                               ),

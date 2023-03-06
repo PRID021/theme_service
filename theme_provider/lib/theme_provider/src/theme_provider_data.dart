@@ -8,6 +8,11 @@ class ThemeService extends InheritedWidget {
     required ThemeData themeData,
   }) onChangeSystemTheme;
 
+  final void Function({
+    required Function nextAction,
+    required Future<bool> Function() confirmAction,
+  }) rollBackScope;
+
   const ThemeService({
     super.key,
     required super.child,
@@ -16,6 +21,7 @@ class ThemeService extends InheritedWidget {
     required ThemeData lightThemeData,
     required ThemeData darkThemeData,
     required ThemeData currentThemeData,
+    required this.rollBackScope,
   })  : _lightThemeData = lightThemeData,
         _darkThemeData = darkThemeData,
         _currentThemeData = currentThemeData;
@@ -42,5 +48,11 @@ class ThemeService extends InheritedWidget {
 
   void changeThemeData({required ThemeData themeData}) {
     onChangeThemeData(themeData: themeData);
+  }
+
+  void rollBackThemeScope(
+      {required Function nextAction,
+      required Future<bool> Function() confirmAction}) {
+    rollBackScope.call(nextAction: nextAction, confirmAction: confirmAction);
   }
 }

@@ -105,6 +105,7 @@ class ThemeServiceProviderState extends State<ThemeServiceProvider>
       currentThemeData: _currentThemeData,
       onChangeSystemTheme: changeSystemTheme,
       onChangeThemeData: changeThemeData,
+      rollBackScope: rollBackScope,
       child: widget.child,
     );
   }
@@ -173,13 +174,43 @@ class ThemeServiceProviderState extends State<ThemeServiceProvider>
   void onSystemThemeChanged() {
     if (!autoReactiveOnSystemThemeChange) return;
     if (_themeModeNotifier.value == Brightness.dark) {
-      setState(() {
-        _currentThemeData = _darkThemeData;
-      });
+      setState(
+        () {
+          _currentThemeData = _darkThemeData;
+        },
+      );
       return;
     }
+    setState(
+      () {
+        _currentThemeData = _lightThemeData;
+      },
+    );
+  }
+
+  void rollBackScope(
+      {required Function nextAction,
+      required Future<bool> Function() confirmAction}) async {
+    // store old theme data
+    ThemeData lightThemeData = _lightThemeData.copyWith();
+    ThemeData darkThemeData = _darkThemeData.copyWith();
+    ThemeData currentThemeData = _currentThemeData.copyWith();
+
     setState(() {
-      _currentThemeData = _lightThemeData;
+      // run next action
+      nextAction();
+      WidgetsBinding.instance.addPostFrameCallback((_) async {
+        // confirmAction
+        bool isConfirm = await confirmAction();
+        if (isConfirm) return;
+
+        // roll back
+        setState(() {
+          _lightThemeData = lightThemeData;
+          _darkThemeData = darkThemeData;
+          _currentThemeData = currentThemeData;
+        });
+      });
     });
   }
 }

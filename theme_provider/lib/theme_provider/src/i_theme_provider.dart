@@ -19,6 +19,11 @@ abstract class IThemeProvider {
     required ThemeData themeData,
   });
 
+  void changeSystemThemeV2({
+    ThemeData? lightThemeData,
+    ThemeData? darkThemeData,
+  });
+
   void onSystemThemeChanged();
 
   bool get isDarkMode;

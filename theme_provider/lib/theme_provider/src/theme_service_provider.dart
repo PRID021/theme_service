@@ -104,6 +104,7 @@ class ThemeServiceProviderState extends State<ThemeServiceProvider>
       darkThemeData: _darkThemeData,
       currentThemeData: _currentThemeData,
       onChangeSystemTheme: changeSystemTheme,
+      onChangeSystemThemeV2: changeSystemThemeV2,
       onChangeThemeData: changeThemeData,
       rollBackScope: rollBackScope,
       child: widget.child,
@@ -117,15 +118,15 @@ class ThemeServiceProviderState extends State<ThemeServiceProvider>
   }) {
     if (changeForDarkTheme) {
       _darkThemeData = themeData;
-      print(
-          "config for dark theme changed with new config ${themeData.colorScheme.primary}");
+      // print(
+      //     "config for dark theme changed with new config ${themeData.colorScheme.primary}");
       onConfigThemeChanged(isChangeForDarkTheme: changeForDarkTheme);
       return;
     }
     if (!changeForDarkTheme) {
       _lightThemeData = themeData;
-      print(
-          "config for light theme changed with new config ${themeData.colorScheme.primary}");
+      // print(
+      //     "config for light theme changed with new config ${themeData.colorScheme.primary}");
       onConfigThemeChanged(isChangeForDarkTheme: changeForDarkTheme);
     }
   }
@@ -189,7 +190,7 @@ class ThemeServiceProviderState extends State<ThemeServiceProvider>
   }
 
   void rollBackScope(
-      {required Function nextAction,
+      {required Function action,
       required Future<bool> Function() confirmAction}) async {
     // store old theme data
     ThemeData lightThemeData = _lightThemeData.copyWith();
@@ -198,7 +199,7 @@ class ThemeServiceProviderState extends State<ThemeServiceProvider>
 
     setState(() {
       // run next action
-      nextAction();
+      action();
       WidgetsBinding.instance.addPostFrameCallback((_) async {
         // confirmAction
         bool isConfirm = await confirmAction();
@@ -212,5 +213,47 @@ class ThemeServiceProviderState extends State<ThemeServiceProvider>
         });
       });
     });
+  }
+
+  @override
+  void changeSystemThemeV2(
+      {ThemeData? lightThemeData, ThemeData? darkThemeData}) {
+    assert(lightThemeData != null || darkThemeData != null,
+        "lightThemeData and darkThemeData can't be null at the same time");
+    // get current theme mode before change to ensure that the theme is changed correctly
+    bool inDarkMode = isDarkMode;
+    if (lightThemeData != null) {
+      //change light theme
+      _lightThemeData = lightThemeData;
+    }
+    if (darkThemeData != null) {
+      //change dark theme
+      _darkThemeData = darkThemeData;
+    }
+
+    // change theme according to current theme mode
+    if (lightThemeData != null && darkThemeData != null) {
+      setState(() {
+        if (inDarkMode) {
+          _currentThemeData = _darkThemeData;
+          return;
+        }
+        _currentThemeData = _lightThemeData;
+      });
+      return;
+    }
+
+    if (lightThemeData != null && darkThemeData == null) {
+      setState(() {
+        _currentThemeData = _lightThemeData;
+      });
+      return;
+    }
+    if (lightThemeData == null && darkThemeData != null) {
+      setState(() {
+        _currentThemeData = darkThemeData;
+      });
+      return;
+    }
   }
 }

@@ -9,7 +9,12 @@ class ThemeService extends InheritedWidget {
   }) onChangeSystemTheme;
 
   final void Function({
-    required Function nextAction,
+    ThemeData? lightThemeData,
+    ThemeData? darkThemeData,
+  }) onChangeSystemThemeV2;
+
+  final void Function({
+    required Function action,
     required Future<bool> Function() confirmAction,
   }) rollBackScope;
 
@@ -21,6 +26,7 @@ class ThemeService extends InheritedWidget {
     required ThemeData lightThemeData,
     required ThemeData darkThemeData,
     required ThemeData currentThemeData,
+    required this.onChangeSystemThemeV2,
     required this.rollBackScope,
   })  : _lightThemeData = lightThemeData,
         _darkThemeData = darkThemeData,
@@ -38,7 +44,7 @@ class ThemeService extends InheritedWidget {
 
   @override
   bool updateShouldNotify(covariant ThemeService oldWidget) {
-    return true;
+    return this != oldWidget;
   }
 
   void changeSystemTheme(
@@ -46,13 +52,19 @@ class ThemeService extends InheritedWidget {
     onChangeSystemTheme(changeForDarkTheme: isDarkMode, themeData: themeData);
   }
 
+  void changeSystemThemeV2(
+      {ThemeData? lightThemeData, ThemeData? darkThemeData}) {
+    onChangeSystemThemeV2(
+        lightThemeData: lightThemeData, darkThemeData: darkThemeData);
+  }
+
   void changeThemeData({required ThemeData themeData}) {
     onChangeThemeData(themeData: themeData);
   }
 
   void rollBackThemeScope(
-      {required Function nextAction,
+      {required Function action,
       required Future<bool> Function() confirmAction}) {
-    rollBackScope.call(nextAction: nextAction, confirmAction: confirmAction);
+    rollBackScope.call(action: action, confirmAction: confirmAction);
   }
 }

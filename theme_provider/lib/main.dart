@@ -145,56 +145,68 @@ class _MyHomePageState extends State<MyHomePage> {
                             setState(() {
                               _selectedOption = value;
 
+                              // ThemeServiceProvider.of(context)
+                              //     .rollBackThemeScope(
+                              //   action: () {
+                              //     ThemeServiceProvider.of(context)
+                              //         .onChangeSystemTheme(
+                              //       changeForDarkTheme:
+                              //           _darkThemes.contains(value),
+                              //       themeData: value as ThemeData,
+                              //     );
+                              //   },
+                              //   confirmAction: () async {
+                              //     showAlertDialog<bool>(BuildContext context) {
+                              //       // set up the buttons
+                              //       Widget cancelButton = TextButton(
+                              //         child: const Text("Cancel"),
+                              //         onPressed: () {
+                              //           Navigator.of(context).pop(false);
+                              //         },
+                              //       );
+                              //       Widget continueButton = TextButton(
+                              //         child: const Text("Continue"),
+                              //         onPressed: () {
+                              //           Navigator.of(context).pop(true);
+                              //         },
+                              //       );
+
+                              //       // set up the AlertDialog
+                              //       AlertDialog alert = AlertDialog(
+                              //         title: const Text("AlertDialog"),
+                              //         content: const Text(
+                              //             "Would you like to continue learning how to use Flutter alerts?"),
+                              //         actions: [
+                              //           cancelButton,
+                              //           continueButton,
+                              //         ],
+                              //       );
+
+                              //       // show the dialog
+                              //       return showDialog<bool?>(
+                              //         context: context,
+                              //         builder: (BuildContext context) {
+                              //           return alert;
+                              //         },
+                              //       );
+                              //     }
+
+                              //     bool? result = await showAlertDialog(context);
+
+                              //     return result ?? false;
+                              //   },
+                              // );
+
+                              /// ThemeServiceProvider.of(context).onChangeSystemThemeV2
+
                               ThemeServiceProvider.of(context)
-                                  .rollBackThemeScope(
-                                nextAction: () {
-                                  ThemeServiceProvider.of(context)
-                                      .onChangeSystemTheme(
-                                    changeForDarkTheme:
-                                        _darkThemes.contains(value),
-                                    themeData: value as ThemeData,
-                                  );
-                                },
-                                confirmAction: () async {
-                                  showAlertDialog<bool>(BuildContext context) {
-                                    // set up the buttons
-                                    Widget cancelButton = TextButton(
-                                      child: const Text("Cancel"),
-                                      onPressed: () {
-                                        Navigator.of(context).pop(false);
-                                      },
-                                    );
-                                    Widget continueButton = TextButton(
-                                      child: const Text("Continue"),
-                                      onPressed: () {
-                                        Navigator.of(context).pop(true);
-                                      },
-                                    );
-
-                                    // set up the AlertDialog
-                                    AlertDialog alert = AlertDialog(
-                                      title: const Text("AlertDialog"),
-                                      content: const Text(
-                                          "Would you like to continue learning how to use Flutter alerts?"),
-                                      actions: [
-                                        cancelButton,
-                                        continueButton,
-                                      ],
-                                    );
-
-                                    // show the dialog
-                                    return showDialog<bool?>(
-                                      context: context,
-                                      builder: (BuildContext context) {
-                                        return alert;
-                                      },
-                                    );
-                                  }
-
-                                  bool? result = await showAlertDialog(context);
-
-                                  return result ?? false;
-                                },
+                                  .onChangeSystemThemeV2(
+                                lightThemeData: _lightThemes.contains(value)
+                                    ? value as ThemeData
+                                    : null,
+                                darkThemeData: _darkThemes.contains(value)
+                                    ? value as ThemeData
+                                    : null,
                               );
                             });
                           },
